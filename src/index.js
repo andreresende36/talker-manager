@@ -16,3 +16,8 @@ app.get('/', (_request, response) => {
 app.listen(PORT, () => {
   console.log('Online');
 });
+
+app.use((error, _req, res, _next) => {
+  console.log(error);
+  res.status(500).json({ message: 'Erro interno do servidor'});
+});

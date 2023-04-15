@@ -3,25 +3,39 @@ const { readFile, writeFile } = require('../utils/fsUtils');
 
 const router = express.Router()
 
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res, next) => {
   try {
-    const result = await readFile();
-    if(!result){
+    const talkers = await readFile();
+    if(!talkers){
       return res.status(200).json([]);
     }
-    return res.status(200).json(result);
+    return res.status(200).json(talkers);
   } catch (error) {
-    return res.status(500).send({ message: `Dados não encontrados. Erro: ${error.message}`});
+    next(error);
   }
+});
+
+router.get('/:id', async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const talkers = await readFile();
+    const selectedTalker = talkers.find((talker) => talker.id === id );
+    if(!selectedTalker){
+      return res.status(404).json({ message: "Pessoa palestrante não encontrada"});
+    }
+    return res.status(200).json(selectedTalker);
+  } catch (error) {
+    next(error);
+  } 
 });
 
 router.post('/', async (req, res) => {
   try {
-    const result = await readFile();
+    const talkers = await readFile();
     const { name, age, talk } = req.body;
-    const id = result[result.length - 1].id + 1
+    const id = talkers[talkers.length - 1].id + 1
     const newTalker = { name, age, id, talk };
-    const updatedTalkers = [...result, newTalker];
+    const updatedTalkers = [...talkers, newTalker];
     await writeFile(updatedTalkers);
     return res.status(201).json(updatedTalkers);
   } catch (error) {
