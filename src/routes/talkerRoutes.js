@@ -11,7 +11,7 @@ router.get('/', async (_req, res, next) => {
     }
     return res.status(200).json(talkers);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 
@@ -25,7 +25,7 @@ router.get('/:id', async (req, res, next) => {
     }
     return res.status(200).json(selectedTalker);
   } catch (error) {
-    next(error);
+    return next(error);
   } 
 });
 
@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
     await writeFile(updatedTalkers);
     return res.status(201).json(updatedTalkers);
   } catch (error) {
-    return res.status(500).send({ message: `Atualização não foi realizada. Erro: ${error.message}`});
+    return next(error);
   }
 });
 
