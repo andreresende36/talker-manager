@@ -3,6 +3,7 @@ const { readFile, writeFile } = require('../utils/fsUtils');
 
 const router = express.Router()
 
+// GET /talker
 router.get('/', async (_req, res, next) => {
   try {
     const talkers = await readFile();
@@ -15,6 +16,7 @@ router.get('/', async (_req, res, next) => {
   }
 });
 
+// GET /talker/:id
 router.get('/:id', async (req, res, next) => {
   try {
     const id = Number(req.params.id);
@@ -29,6 +31,7 @@ router.get('/:id', async (req, res, next) => {
   } 
 });
 
+// POST /talker
 router.post('/', async (req, res) => {
   try {
     const talkers = await readFile();
