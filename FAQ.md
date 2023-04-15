@@ -1,4 +1,4 @@
-# Dúvidas frequente s
+# Dúvidas frequentes
 
 Abaixo estão algumas orientações e dúvidas comuns ao desenvolvimento do projeto.
 
