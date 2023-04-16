@@ -10,10 +10,10 @@ const readFile = async () => {
   } catch (error) {
     console.log(`Não foi possível ler o arquivo: ${error.message}`);
   }
-}
+};
 
 const writeFile = async (file) => {
   fs.writeFile(talkerPath, JSON.stringify(file));
-}
+};
 
 module.exports = { readFile, writeFile };

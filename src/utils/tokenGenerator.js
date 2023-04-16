@@ -1,4 +1,4 @@
-const base62Characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const base62Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 const tokenLength = 16;
 
 const tokenGenerator = () => {
@@ -9,7 +9,5 @@ const tokenGenerator = () => {
   }
   return token.join('');
 };
-
-console.log(tokenGenerator());
 
 module.exports = tokenGenerator;
