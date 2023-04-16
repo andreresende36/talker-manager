@@ -75,4 +75,15 @@ router.put('/:id', validations, validateTalker, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
+// DELETE /talker:id
+router.delete('/:id', validateToken, async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const talkers = await readFile();
+    const updatedTalkers = talkers.filter((talker) => talker.id !== id);
+    await writeFile(updatedTalkers);
+    res.status(204).end();
+  } catch (error) { next(error); }
+});
+
 module.exports = router;
