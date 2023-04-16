@@ -6,7 +6,15 @@ const validateAge = require('../middlewares/validateAge');
 const validateTalk = require('../middlewares/validateTalk');
 const validateWatchedAt = require('../middlewares/validateWatchedAt');
 const validateRate = require('../middlewares/validateRate');
+const validateTalker = require('../middlewares/validateTalker');
 
+const validations = [
+  validateToken,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateWatchedAt,
+  validateRate];
 const router = express.Router();
 
 // GET /talker
@@ -23,14 +31,9 @@ router.get('/', async (_req, res, next) => {
 });
 
 // GET /talker/:id
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', validateTalker, async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
-    const talkers = await readFile();
-    const selectedTalker = talkers.find((talker) => talker.id === id);
-    if (!selectedTalker) {
-      return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
-    }
+    const { selectedTalker } = req;
     return res.status(200).json(selectedTalker);
   } catch (error) {
     return next(error);
@@ -38,15 +41,6 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // POST /talker
-
-const validations = [
-  validateToken,
-  validateName,
-  validateAge,
-  validateTalk,
-  validateWatchedAt,
-  validateRate];
-
 router.post('/', validations, async (req, res, next) => {
   try {
     const talkers = await readFile();
@@ -59,6 +53,26 @@ router.post('/', validations, async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
+});
+
+// PUT /talker/:id
+router.put('/:id', validations, validateTalker, async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const { name, age, talk } = req.body;
+    const editedTalker = { id, name, age, talk };
+    const talkers = await readFile();
+    let index;
+    const updatedTalkers = talkers.map((talker, i) => {
+      if (talker.id === id) {
+        index = i;
+        return editedTalker;
+      }
+      return talker;
+    });
+    await writeFile(updatedTalkers);
+    res.status(200).json(updatedTalkers[index]);
+  } catch (error) { next(error); }
 });
 
 module.exports = router;
