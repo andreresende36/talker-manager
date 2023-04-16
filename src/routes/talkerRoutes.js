@@ -1,3 +1,4 @@
+// Importações
 const express = require('express');
 const { readFile, writeFile } = require('../utils/fsUtils');
 const validateToken = require('../middlewares/validateToken');
@@ -8,6 +9,7 @@ const validateWatchedAt = require('../middlewares/validateWatchedAt');
 const validateRate = require('../middlewares/validateRate');
 const validateTalker = require('../middlewares/validateTalker');
 
+// Middlewares de Validação
 const validations = [
   validateToken,
   validateName,
@@ -27,6 +29,22 @@ router.get('/', async (_req, res, next) => {
     return res.status(200).json(talkers);
   } catch (error) {
     return next(error);
+  }
+});
+
+// GET /talker/search
+router.get('/search', validateToken, async (req, res, next) => {
+  try {
+    const query = req.query.q;
+    const talkers = await readFile();
+    if (!query) return res.status(200).json(talkers);
+    const selectedTalkers = talkers.filter(
+      (talker) => talker.name.toUpperCase().includes(query.toUpperCase()),
+    );
+    if (!selectedTalkers) return res.status(200).json([]);
+    return res.status(200).json(selectedTalkers);
+  } catch (error) {
+    next(error);
   }
 });
 
