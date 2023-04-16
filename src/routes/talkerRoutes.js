@@ -8,6 +8,7 @@ const validateTalk = require('../middlewares/validateTalk');
 const validateWatchedAt = require('../middlewares/validateWatchedAt');
 const validateRate = require('../middlewares/validateRate');
 const validateTalker = require('../middlewares/validateTalker');
+const searchFilter = require('../middlewares/searchFilter');
 
 // Middlewares de Validação
 const validations = [
@@ -21,8 +22,8 @@ const router = express.Router();
 
 // GET /talker
 router.get('/', async (_req, res, next) => {
+  const talkers = await readFile();
   try {
-    const talkers = await readFile();
     if (!talkers) {
       return res.status(200).json([]);
     }
@@ -33,16 +34,10 @@ router.get('/', async (_req, res, next) => {
 });
 
 // GET /talker/search
-router.get('/search', validateToken, async (req, res, next) => {
+router.get('/search', validateToken, searchFilter, validateRate, async (req, res, next) => {
   try {
-    const query = req.query.q;
-    const talkers = await readFile();
-    if (!query) return res.status(200).json(talkers);
-    const selectedTalkers = talkers.filter(
-      (talker) => talker.name.toUpperCase().includes(query.toUpperCase()),
-    );
-    if (!selectedTalkers) return res.status(200).json([]);
-    return res.status(200).json(selectedTalkers);
+    const { searchResult } = req;
+    res.status(200).json(searchResult);
   } catch (error) {
     next(error);
   }
@@ -60,8 +55,8 @@ router.get('/:id', validateTalker, async (req, res, next) => {
 
 // POST /talker
 router.post('/', validations, async (req, res, next) => {
+  const talkers = await readFile();
   try {
-    const talkers = await readFile();
     const { name, age, talk } = req.body;
     const id = talkers[talkers.length - 1].id + 1;
     const newTalker = { name, age, id, talk };
@@ -75,11 +70,11 @@ router.post('/', validations, async (req, res, next) => {
 
 // PUT /talker/:id
 router.put('/:id', validations, validateTalker, async (req, res, next) => {
+  const talkers = await readFile();
   try {
     const id = Number(req.params.id);
     const { name, age, talk } = req.body;
     const editedTalker = { id, name, age, talk };
-    const talkers = await readFile();
     let index;
     const updatedTalkers = talkers.map((talker, i) => {
       if (talker.id === id) {
@@ -95,9 +90,9 @@ router.put('/:id', validations, validateTalker, async (req, res, next) => {
 
 // DELETE /talker:id
 router.delete('/:id', validateToken, async (req, res, next) => {
+  const talkers = await readFile();
   try {
     const id = Number(req.params.id);
-    const talkers = await readFile();
     const updatedTalkers = talkers.filter((talker) => talker.id !== id);
     await writeFile(updatedTalkers);
     res.status(204).end();

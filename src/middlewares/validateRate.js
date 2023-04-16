@@ -1,5 +1,10 @@
+const chooseTypeOfRate = (req) => {
+  const { rate } = req.body.talk || req.query;
+  return rate;
+};
+
 const validateRate = async (req, res, next) => {
-  const { rate } = req.body.talk;
+  const rate = Number(chooseTypeOfRate(req));
   if (rate === undefined) {
     return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
   }
