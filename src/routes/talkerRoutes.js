@@ -36,12 +36,12 @@ router.get('/', async (_req, res, next) => {
 });
 
 // GET /talker/search
-
 const searchValidations = [
   validateToken,
   qFilter,
   rateFilter,
   dateFilter];
+
 router.get('/search', searchValidations, async (req, res, next) => {
   try {
     const { searchResult } = req;
@@ -105,6 +105,25 @@ router.delete('/:id', validateToken, async (req, res, next) => {
     await writeFile(updatedTalkers);
     res.status(204).end();
   } catch (error) { next(error); }
+});
+
+// PATCH /talker/rate/:id
+router.patch('/rate/:id', validateToken, validateRate, async (req, res, next) => {
+  const talkers = await readFile();
+  try {
+    const id = Number(req.params.id);
+    const { rate } = req.body;
+    const updatedTalkers = talkers.map((talker) => {
+      if (talker.id === id) {
+        return { ...talker, talk: { watchedAt: talker.talk.watchedAt, rate } };
+      }
+      return talker;
+    });
+    await writeFile(updatedTalkers);
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;
