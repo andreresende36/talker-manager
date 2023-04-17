@@ -8,7 +8,9 @@ const validateTalk = require('../middlewares/validateTalk');
 const validateWatchedAt = require('../middlewares/validateWatchedAt');
 const validateRate = require('../middlewares/validateRate');
 const validateTalker = require('../middlewares/validateTalker');
-const searchFilter = require('../middlewares/searchFilter');
+const qFilter = require('../middlewares/qFilter');
+const rateFilter = require('../middlewares/rateFilter');
+const dateFilter = require('../middlewares/dateFilter');
 
 // Middlewares de Validação
 const validations = [
@@ -34,7 +36,13 @@ router.get('/', async (_req, res, next) => {
 });
 
 // GET /talker/search
-router.get('/search', validateToken, searchFilter, validateRate, async (req, res, next) => {
+
+const searchValidations = [
+  validateToken,
+  qFilter,
+  rateFilter,
+  dateFilter];
+router.get('/search', searchValidations, async (req, res, next) => {
   try {
     const { searchResult } = req;
     res.status(200).json(searchResult);
