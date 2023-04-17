@@ -11,6 +11,7 @@ const validateTalker = require('../middlewares/validateTalker');
 const qFilter = require('../middlewares/qFilter');
 const rateFilter = require('../middlewares/rateFilter');
 const dateFilter = require('../middlewares/dateFilter');
+const connection = require('../db/connection');
 
 // Middlewares de Validação
 const validations = [
@@ -46,6 +47,23 @@ router.get('/search', searchValidations, async (req, res, next) => {
   try {
     const { searchResult } = req;
     res.status(200).json(searchResult);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// GET /talker/db
+router.get('/db', async (req, res, next) => {
+  try {
+    const [result] = await connection.execute('SELECT * FROM talkers');
+    if (!result) return res.status(200).json([]);
+    const formatToJson = result.map((talker) => ({
+        name: talker.name,
+        age: talker.age,
+        id: talker.id,
+        talk: { watchedAt: talker.talk_watched_at, rate: talker.talk_rate },
+      }));
+    return res.status(200).json(formatToJson);
   } catch (error) {
     next(error);
   }
